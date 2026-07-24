@@ -29,6 +29,9 @@ class WatermarkApp(tk.Tk):
     ACCENT = "#6558F5"
     ACCENT_HOVER = "#5547E8"
     ACCENT_SOFT = "#EEECFF"
+    PRIMARY = "#4B3FD1"
+    PRIMARY_HOVER = "#3D32B5"
+    PRIMARY_BORDER = "#30278F"
     SUCCESS = "#1E9D68"
     DANGER = "#D94B57"
 
@@ -521,26 +524,53 @@ class WatermarkApp(tk.Tk):
         ]
         for column in range(3):
             quality_wrap.grid_columnconfigure(column, weight=1)
+        self.quality_buttons: dict[str, tk.Radiobutton] = {}
         for index, (value, description) in enumerate(qualities):
             option = tk.Radiobutton(
                 quality_wrap,
                 text=f"{value}\n{description}",
                 value=value,
                 variable=self.quality,
+                command=self._refresh_quality_ui,
                 indicatoron=False,
                 justify="center",
                 relief="flat",
                 bd=0,
                 bg=self.CARD_ALT,
                 fg=self.TEXT,
-                selectcolor=self.ACCENT_SOFT,
+                selectcolor=self.CARD_ALT,
                 activebackground=self.ACCENT_SOFT,
                 activeforeground=self.ACCENT,
-                font=("Helvetica Neue", 9),
+                highlightbackground=self.BORDER,
+                highlightcolor=self.BORDER,
+                highlightthickness=1,
+                font=("Helvetica Neue", 9, "bold"),
                 cursor="hand2",
                 pady=8,
             )
             option.grid(row=0, column=index, sticky="ew", padx=3)
+            self.quality_buttons[value] = option
+        self._refresh_quality_ui()
+
+    def _refresh_quality_ui(self) -> None:
+        """Keep the export-quality selection visible on every Tk platform."""
+        for value, button in self.quality_buttons.items():
+            selected = value == self.quality.get()
+            button.configure(
+                bg=self.PRIMARY if selected else self.CARD_ALT,
+                fg="white" if selected else self.TEXT,
+                selectcolor=self.PRIMARY if selected else self.CARD_ALT,
+                activebackground=(
+                    self.PRIMARY_HOVER if selected else self.ACCENT_SOFT
+                ),
+                activeforeground="white" if selected else self.ACCENT,
+                highlightbackground=(
+                    self.PRIMARY_BORDER if selected else self.BORDER
+                ),
+                highlightcolor=(
+                    self.PRIMARY_BORDER if selected else self.BORDER
+                ),
+            )
 
     def _on_settings_content_resize(self, _event=None) -> None:
         self.settings_canvas.configure(
@@ -897,9 +927,10 @@ class WatermarkApp(tk.Tk):
         padx: int = 12,
         pady: int = 7,
     ) -> tk.Button:
-        background = self.ACCENT if primary else self.CARD
+        background = self.PRIMARY if primary else self.CARD
         foreground = "white" if primary else self.TEXT
-        active_background = self.ACCENT_HOVER if primary else self.CARD_ALT
+        active_background = self.PRIMARY_HOVER if primary else self.CARD_ALT
+        border = self.PRIMARY_BORDER if primary else self.BORDER
         return tk.Button(
             parent,
             text=text,
@@ -911,8 +942,9 @@ class WatermarkApp(tk.Tk):
             disabledforeground="#A5A8B0",
             relief="flat",
             bd=0,
-            highlightbackground=self.BORDER,
-            highlightthickness=0 if primary else 1,
+            highlightbackground=border,
+            highlightcolor=border,
+            highlightthickness=1,
             font=("Helvetica Neue", 10, "bold"),
             padx=padx,
             pady=pady,

@@ -1,0 +1,16 @@
+AiMarkTool Windows portable package includes FFmpeg and FFprobe.
+
+FFmpeg project:
+https://ffmpeg.org/
+
+Windows binaries:
+https://github.com/BtbN/FFmpeg-Builds
+
+The automated build downloads the current 64-bit GPL static build from the
+officially linked BtbN build provider and validates it against the SHA-256
+digest reported by the GitHub Releases API before packaging.
+
+FFmpeg is licensed separately from AiMarkTool. License information and source
+code links are available from:
+https://ffmpeg.org/legal.html
+https://github.com/BtbN/FFmpeg-Builds

@@ -262,14 +262,25 @@ class WatermarkApp(tk.Tk):
             font=("Helvetica Neue", 9),
         ).pack(anchor="w", pady=(5, 0))
 
-        self._button(
+        self.add_video_button = self._button(
             add_area,
             "+  添加视频",
             self._add_videos,
             primary=True,
-            padx=16,
-            pady=9,
-        ).pack(side="right", padx=16)
+            padx=18,
+            pady=10,
+        )
+        # Use an explicit high-contrast style here because the macOS Aqua
+        # theme can otherwise soften custom Tk button foreground colors.
+        self.add_video_button.configure(
+            bg="#493DD3",
+            fg="#FFFFFF",
+            activebackground="#382DB9",
+            activeforeground="#FFFFFF",
+            highlightbackground="#493DD3",
+            font=("Helvetica Neue", 11, "bold"),
+        )
+        self.add_video_button.pack(side="right", padx=16)
 
         list_header = tk.Frame(body, bg=self.CARD)
         list_header.pack(fill="x", pady=(2, 7))
@@ -521,19 +532,21 @@ class WatermarkApp(tk.Tk):
         ]
         for column in range(3):
             quality_wrap.grid_columnconfigure(column, weight=1)
+        self.quality_buttons: dict[str, tk.Radiobutton] = {}
         for index, (value, description) in enumerate(qualities):
             option = tk.Radiobutton(
                 quality_wrap,
                 text=f"{value}\n{description}",
                 value=value,
                 variable=self.quality,
+                command=self._refresh_quality_ui,
                 indicatoron=False,
                 justify="center",
                 relief="flat",
                 bd=0,
                 bg=self.CARD_ALT,
                 fg=self.TEXT,
-                selectcolor=self.ACCENT_SOFT,
+                selectcolor=self.ACCENT,
                 activebackground=self.ACCENT_SOFT,
                 activeforeground=self.ACCENT,
                 font=("Helvetica Neue", 9),
@@ -541,6 +554,27 @@ class WatermarkApp(tk.Tk):
                 pady=8,
             )
             option.grid(row=0, column=index, sticky="ew", padx=3)
+            self.quality_buttons[value] = option
+        self._refresh_quality_ui()
+
+    def _refresh_quality_ui(self) -> None:
+        """Keep export-quality selection visible on every Tk theme."""
+        for value, option in self.quality_buttons.items():
+            selected = value == self.quality.get()
+            option.configure(
+                bg=self.ACCENT if selected else self.CARD_ALT,
+                fg="#FFFFFF" if selected else self.TEXT,
+                selectcolor=self.ACCENT if selected else self.CARD_ALT,
+                activebackground=(
+                    self.ACCENT_HOVER if selected else self.ACCENT_SOFT
+                ),
+                activeforeground="#FFFFFF" if selected else self.ACCENT,
+                font=(
+                    "Helvetica Neue",
+                    9,
+                    "bold" if selected else "normal",
+                ),
+            )
 
     def _on_settings_content_resize(self, _event=None) -> None:
         self.settings_canvas.configure(

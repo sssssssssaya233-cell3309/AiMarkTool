@@ -1,0 +1,2 @@
+# 无第三方 Python 依赖。
+# 本工具仅使用 Python 标准库中的 tkinter。

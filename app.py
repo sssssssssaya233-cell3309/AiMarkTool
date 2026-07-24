@@ -29,6 +29,9 @@ class WatermarkApp(tk.Tk):
     ACCENT = "#6558F5"
     ACCENT_HOVER = "#5547E8"
     ACCENT_SOFT = "#EEECFF"
+    PRIMARY = "#4B3FD1"
+    PRIMARY_HOVER = "#3D32B5"
+    PRIMARY_BORDER = "#30278F"
     SUCCESS = "#1E9D68"
     DANGER = "#D94B57"
 
@@ -262,25 +265,14 @@ class WatermarkApp(tk.Tk):
             font=("Helvetica Neue", 9),
         ).pack(anchor="w", pady=(5, 0))
 
-        self.add_video_button = self._button(
+        self._button(
             add_area,
             "+  添加视频",
             self._add_videos,
             primary=True,
-            padx=18,
-            pady=10,
-        )
-        # Use an explicit high-contrast style here because the macOS Aqua
-        # theme can otherwise soften custom Tk button foreground colors.
-        self.add_video_button.configure(
-            bg="#493DD3",
-            fg="#FFFFFF",
-            activebackground="#382DB9",
-            activeforeground="#FFFFFF",
-            highlightbackground="#493DD3",
-            font=("Helvetica Neue", 11, "bold"),
-        )
-        self.add_video_button.pack(side="right", padx=16)
+            padx=16,
+            pady=9,
+        ).pack(side="right", padx=16)
 
         list_header = tk.Frame(body, bg=self.CARD)
         list_header.pack(fill="x", pady=(2, 7))
@@ -546,10 +538,13 @@ class WatermarkApp(tk.Tk):
                 bd=0,
                 bg=self.CARD_ALT,
                 fg=self.TEXT,
-                selectcolor=self.ACCENT,
+                selectcolor=self.CARD_ALT,
                 activebackground=self.ACCENT_SOFT,
                 activeforeground=self.ACCENT,
-                font=("Helvetica Neue", 9),
+                highlightbackground=self.BORDER,
+                highlightcolor=self.BORDER,
+                highlightthickness=1,
+                font=("Helvetica Neue", 9, "bold"),
                 cursor="hand2",
                 pady=8,
             )
@@ -558,21 +553,22 @@ class WatermarkApp(tk.Tk):
         self._refresh_quality_ui()
 
     def _refresh_quality_ui(self) -> None:
-        """Keep export-quality selection visible on every Tk theme."""
-        for value, option in self.quality_buttons.items():
+        """Keep the export-quality selection visible on every Tk platform."""
+        for value, button in self.quality_buttons.items():
             selected = value == self.quality.get()
-            option.configure(
-                bg=self.ACCENT if selected else self.CARD_ALT,
-                fg="#FFFFFF" if selected else self.TEXT,
-                selectcolor=self.ACCENT if selected else self.CARD_ALT,
+            button.configure(
+                bg=self.PRIMARY if selected else self.CARD_ALT,
+                fg="white" if selected else self.TEXT,
+                selectcolor=self.PRIMARY if selected else self.CARD_ALT,
                 activebackground=(
-                    self.ACCENT_HOVER if selected else self.ACCENT_SOFT
+                    self.PRIMARY_HOVER if selected else self.ACCENT_SOFT
                 ),
-                activeforeground="#FFFFFF" if selected else self.ACCENT,
-                font=(
-                    "Helvetica Neue",
-                    9,
-                    "bold" if selected else "normal",
+                activeforeground="white" if selected else self.ACCENT,
+                highlightbackground=(
+                    self.PRIMARY_BORDER if selected else self.BORDER
+                ),
+                highlightcolor=(
+                    self.PRIMARY_BORDER if selected else self.BORDER
                 ),
             )
 
@@ -931,9 +927,10 @@ class WatermarkApp(tk.Tk):
         padx: int = 12,
         pady: int = 7,
     ) -> tk.Button:
-        background = self.ACCENT if primary else self.CARD
+        background = self.PRIMARY if primary else self.CARD
         foreground = "white" if primary else self.TEXT
-        active_background = self.ACCENT_HOVER if primary else self.CARD_ALT
+        active_background = self.PRIMARY_HOVER if primary else self.CARD_ALT
+        border = self.PRIMARY_BORDER if primary else self.BORDER
         return tk.Button(
             parent,
             text=text,
@@ -945,8 +942,9 @@ class WatermarkApp(tk.Tk):
             disabledforeground="#A5A8B0",
             relief="flat",
             bd=0,
-            highlightbackground=self.BORDER,
-            highlightthickness=0 if primary else 1,
+            highlightbackground=border,
+            highlightcolor=border,
+            highlightthickness=1,
             font=("Helvetica Neue", 10, "bold"),
             padx=padx,
             pady=pady,

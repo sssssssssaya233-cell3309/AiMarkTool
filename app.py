@@ -37,14 +37,37 @@ class WatermarkApp(tk.Tk):
         self.title("水印工坊")
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
-        window_width = max(900, min(1160, screen_width - 80))
-        window_height = max(620, min(820, screen_height - 120))
-        window_x = max(20, (screen_width - window_width) // 2)
-        window_y = max(35, (screen_height - window_height) // 2)
+
+        # Tk reports the full macOS screen bounds, including the menu bar and
+        # Dock. Reserve a safe area so the fixed export bar is visible on
+        # first launch without requiring the user to maximize the window.
+        is_macos = sys.platform == "darwin"
+        side_safe_area = 40
+        top_safe_area = 48 if is_macos else 30
+        bottom_safe_area = 90 if is_macos else 50
+        available_width = max(760, screen_width - side_safe_area * 2)
+        available_height = max(
+            480,
+            screen_height - top_safe_area - bottom_safe_area,
+        )
+
+        window_width = min(1160, available_width)
+        window_height = min(760, available_height)
+        window_x = max(
+            side_safe_area,
+            (screen_width - window_width) // 2,
+        )
+        window_y = top_safe_area + max(
+            0,
+            (available_height - window_height) // 2,
+        )
         self.geometry(
             f"{window_width}x{window_height}+{window_x}+{window_y}"
         )
-        self.minsize(min(900, window_width), min(620, window_height))
+        self.minsize(
+            min(820, window_width),
+            min(520, window_height),
+        )
         self.configure(bg=self.BG)
 
         self.video_paths: list[str] = []
